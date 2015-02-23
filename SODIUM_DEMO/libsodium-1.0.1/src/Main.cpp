@@ -47,10 +47,13 @@ void LoadDigitalData(char *&message, int &messageLen, unsigned char *&signature,
 	fclose(file);
 }
 
-void  Signing(char* message, unsigned char *sk, unsigned char* &signature, unsigned long long &signatureLen)
+void  Signing(char* message, int messageLen, unsigned char *sk, unsigned char* &signature, unsigned long long &signatureLen)
 {
-	unsigned char hash[crypto_generichash_BYTES];
-	crypto_generichash(hash, sizeof hash, (unsigned char*)message, strlen(message), NULL, 0);
+	//unsigned char hash[crypto_generichash_BYTES];
+	//crypto_generichash(hash, sizeof hash, (unsigned char*)message, messageLen, NULL, 0);
+
+	unsigned char hash[crypto_hash_sha256_BYTES];
+	crypto_hash_sha256(hash, (unsigned char*)message, messageLen);
 
 	signature = new unsigned char[crypto_sign_BYTES + sizeof hash];
 
@@ -60,8 +63,11 @@ void  Signing(char* message, unsigned char *sk, unsigned char* &signature, unsig
 
 bool Verifying(char* message, int messageLen, unsigned char* signature, int signatureLen, unsigned char* pk)
 {
-	unsigned char hash[crypto_generichash_BYTES];
-	crypto_generichash(hash, sizeof hash, (unsigned char*)message, messageLen, NULL, 0);
+	//unsigned char hash[crypto_generichash_BYTES];
+	//crypto_generichash(hash, sizeof hash, (unsigned char*)message, messageLen, NULL, 0);
+
+	unsigned char hash[crypto_hash_sha256_BYTES];
+	crypto_hash_sha256(hash, (unsigned char*)message, messageLen);
 
 	unsigned char unsealed_message[sizeof hash];
 	unsigned long long unsealed_message_len;
@@ -141,8 +147,9 @@ void main()
 			printf("Please enter your original message:");
 			flushall();
 			gets(message);
-			
-			Signing(message, sk, signature, signatureLen);
+
+			int messageLen = strlen(message);
+			Signing(message, messageLen, sk, signature, signatureLen);
 
 			SaveDigitalData(message, strlen(message), signature, signatureLen, DIGITAL_DATA_FILE_PATH);
 

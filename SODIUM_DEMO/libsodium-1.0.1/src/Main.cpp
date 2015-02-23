@@ -52,8 +52,8 @@ void  Signing(char* message, int messageLen, unsigned char *sk, unsigned char* &
 	//unsigned char hash[crypto_generichash_BYTES];
 	//crypto_generichash(hash, sizeof hash, (unsigned char*)message, messageLen, NULL, 0);
 
-	unsigned char hash[crypto_hash_sha256_BYTES];
-	crypto_hash_sha256(hash, (unsigned char*)message, messageLen);
+	unsigned char hash[crypto_hash_sha512_BYTES];
+	crypto_hash_sha512(hash, (unsigned char*)message, messageLen);
 
 	signature = new unsigned char[crypto_sign_BYTES + sizeof hash];
 
@@ -66,8 +66,8 @@ bool Verifying(char* message, int messageLen, unsigned char* signature, int sign
 	//unsigned char hash[crypto_generichash_BYTES];
 	//crypto_generichash(hash, sizeof hash, (unsigned char*)message, messageLen, NULL, 0);
 
-	unsigned char hash[crypto_hash_sha256_BYTES];
-	crypto_hash_sha256(hash, (unsigned char*)message, messageLen);
+	unsigned char hash[crypto_hash_sha512_BYTES];
+	crypto_hash_sha512(hash, (unsigned char*)message, messageLen);
 
 	unsigned char unsealed_message[sizeof hash];
 	unsigned long long unsealed_message_len;
@@ -151,7 +151,7 @@ void main()
 			int messageLen = strlen(message);
 			Signing(message, messageLen, sk, signature, signatureLen);
 
-			SaveDigitalData(message, strlen(message), signature, signatureLen, DIGITAL_DATA_FILE_PATH);
+			SaveDigitalData(message, messageLen, signature, signatureLen, DIGITAL_DATA_FILE_PATH);
 
 			delete[] signature;
 
@@ -166,11 +166,11 @@ void main()
 
 			if (iSOK)
 			{
-				printf("THIS IS A VALID SIGNATURE\n");
+				printf("==> THIS IS A VALID SIGNATURE\n\n");
 			}
 			else
 			{
-				printf("THIS IS NOT A VALID SIGNATURE\n");
+				printf("==> THIS IS NOT A VALID SIGNATURE\n\n");
 			}
 
 			delete[] message;
